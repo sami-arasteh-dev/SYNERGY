@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Smart Synergy Network</title>
+<link rel="stylesheet" href="/static/style.css">
+<script src="https://unpkg.com/cytoscape@3.31.2/dist/cytoscape.min.js"></script>
+</head>
+<body>
+<div class="shell">
+<header class="topbar">
+  <div><div class="brand">SYN<span>ERGY</span></div><div class="subtitle">هوش تجاری شبکه مشتریان و شرکای تجاری</div></div>
+  <div class="status"><i id="dot"></i><span id="statusText">سیستم آماده است</span></div>
+</header>
+
+<nav class="tabs">
+<button class="tab active" data-tab="dashboard">داشبورد</button>
+<button class="tab" data-tab="orgs">مجموعه‌ها و داده‌ها</button>
+<button class="tab" data-tab="analysis">تحلیل شبکه</button>
+<button class="tab" data-tab="saved">تحلیل‌های ذخیره‌شده</button>
+<button class="tab" data-tab="settings">تنظیمات مدل / API</button>
+</nav>
+
+<main>
+<section id="dashboard" class="tabpage active">
+  <div class="hero">
+    <div><div class="eyebrow">INTELLIGENT COMMERCIAL SYNERGY</div>
+    <h1>از داده‌های پراکنده، <span>شبکه فروش هوشمند</span> بساز.</h1>
+    <p>مجموعه محور را تعریف کنید، مجموعه‌های دیگر را وارد کنید و موتور هوشمند، روابط جهت‌دار و وزن‌دار، جریان ارجاع مشتری، پیشنهادهای متقابل و کمپین‌های زمان‌بندی‌شده را استخراج می‌کند.</p></div>
+    <div class="hero-orb">↗<small>AI</small></div>
+  </div>
+  <div class="metrics">
+    <div class="metric"><b id="mOrg">0</b><span>مجموعه ثبت‌شده</span></div>
+    <div class="metric"><b id="mAna">0</b><span>تحلیل انجام‌شده</span></div>
+    <div class="metric"><b id="mCard">0</b><span>پیشنهاد ذخیره‌شده</span></div>
+    <div class="metric"><b>∞</b><span>تعداد شبکه / ارتباط</span></div>
+  </div>
+  <div class="quick">
+    <div><b>۱</b><span>داده و زمینه تجاری را وارد کنید</span></div>
+    <div><b>۲</b><span>مجموعه محور و شبکه را مشخص کنید</span></div>
+    <div><b>۳</b><span>مدل، گراف و پیشنهادها را تولید می‌کند</span></div>
+  </div>
+</section>
+
+<section id="orgs" class="tabpage">
+ <div class="sectionhead"><div><h2>مجموعه‌ها و داده‌ها</h2><p>هر تعداد مجموعه که لازم دارید اضافه کنید؛ هیچ سقف منطقی برای تعداد گره‌های شبکه تعریف نشده است.</p></div><button class="primary" onclick="openOrg()">+ افزودن مجموعه</button></div>
+ <div id="orgList" class="orggrid"></div>
+ <div class="panel importbox"><h3>ورود داده از فایل</h3><p>CSV / JSON / XLSX / XLS</p><input type="file" id="fileInput" accept=".csv,.json,.xlsx,.xls"><button class="secondary" onclick="importFile()">خواندن فایل</button><pre id="importPreview"></pre></div>
+</section>
+
+<section id="analysis" class="tabpage">
+ <div class="sectionhead"><div><h2>تحلیل شبکه هوشمند</h2><p>مدل بر اساس داده‌های واردشده، روابط احتمالی، ارزش تجاری، شرایط و سیگنال‌های بیرونی شبکه را می‌سازد.</p></div></div>
+ <div class="analysisForm panel">
+  <label>مجموعه محور<select id="axis"></select></label>
+  <label>مجموعه‌های واردشونده به شبکه<div id="orgChecks" class="checks"></div></label>
+  <label>عنوان تحلیل<input id="title" value="شبکه هم‌افزایی فروش و مشتریان"></label>
+  <label>اطلاعات و درخواست تکمیلی<textarea id="context" rows="7" placeholder="مثلاً: هدف اصلی افزایش فروش B2B، جذب مشتری جدید، طراحی همکاری با هتل‌ها، رستوران‌ها و باشگاه‌ها، محدودیت ظرفیت، شهرهای هدف، فصل اجرا، دامنه تقریبی تخفیف‌ها و..."></textarea></label>
+  <button class="primary big" onclick="runAnalysis()">✦ ساخت شبکه هوشمند و پیشنهادها</button>
+ </div>
+ <div id="result" class="hidden">
+   <div class="resulthead"><h2 id="resultTitle">نتیجه</h2><a id="exportBtn" class="secondary" href="#">خروجی JSON</a></div>
+   <div class="summary panel"><h3>استراتژی شبکه</h3><p id="summary"></p><p id="strategy"></p></div>
+   <div class="graphpanel panel"><div class="graphhead"><h3>گراف جهت‌دار و وزن‌دار</h3><span>ضخامت یال = وزن رابطه</span></div><div id="cy"></div></div>
+   <div class="twocol"><div><h3>پیشنهادهای هوشمند</h3><div id="cards" class="cards"></div></div>
+   <div><h3>سیگنال‌های بیرونی و فرضیات</h3><div id="signals" class="sidecards"></div></div></div>
+   <div class="panel"><h3>کمپین‌های پیشنهادی</h3><div id="campaigns"></div></div>
+ </div>
+</section>
+
+<section id="saved" class="tabpage">
+ <div class="sectionhead"><div><h2>تحلیل‌های ذخیره‌شده</h2><p>تمام تحلیل‌ها در SQLite محلی نگهداری می‌شوند.</p></div></div>
+ <div id="savedList" class="savedlist"></div>
+</section>
+
+<section id="settings" class="tabpage">
+ <div class="sectionhead"><div><h2>تنظیمات مدل / API</h2><p>این تب مستقل برای ورود و نگهداری API و ویژگی‌های مدل طراحی شده است.</p></div></div>
+ <div class="panel settingsform">
+  <label>API Base URL<input id="api_base" value="https://api.gapgpt.app/v1"></label>
+  <label>API Key<input id="api_key" type="password" placeholder="کلید API"></label>
+  <label>Model<input id="model" value="gpt-4o"></label>
+  <label>Temperature<input id="temperature" type="number" min="0" max="2" step=".1" value=".2"></label>
+  <label>Max Tokens<input id="max_tokens" type="number" value="6000"></label>
+  <label>Extra Headers (JSON)<textarea id="extra_headers" rows="4">{}</textarea></label>
+  <button class="primary" onclick="saveSettings()">ذخیره تنظیمات</button>
+  <div class="hint">کلید API فقط روی همین سیستم در SQLite ذخیره می‌شود. برای استقرار سازمانی، احراز هویت و رمزنگاری/Secret Manager توصیه می‌شود.</div>
+ </div>
+</section>
+</main>
+</div>
+
+<div id="modal" class="modal hidden"><div class="modalbox"><button class="close" onclick="closeOrg()">×</button><h2>افزودن مجموعه</h2>
+<label>نام مجموعه<input id="oname"></label><label>نقش<select id="orole"><option value="axis">مجموعه محور</option><option value="partner">شریک تجاری</option><option value="customer">مشتری B2B</option><option value="prospect">مشتری بالقوه</option><option value="supplier">تأمین‌کننده</option><option value="other">سایر</option></select></label>
+<label>شرح کسب‌وکار<textarea id="odesc" rows="4"></textarea></label>
+<label>داده ساختاریافته JSON<textarea id="odata" rows="8">{
+  "products": [],
+  "services": [],
+  "customer_segments": [],
+  "locations": [],
+  "sales_channels": [],
+  "capacity": "",
+  "commercial_preferences": [],
+  "constraints": []
+}</textarea></label>
+<button class="primary" onclick="saveOrg()">ذخیره مجموعه</button></div></div>
+
+<script src="/static/app.js"></script>
+</body></html>
